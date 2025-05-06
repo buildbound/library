@@ -1,0 +1,3 @@
+test-message:
+    content:
+        - "<rainbow>Hi, <white><b><player_name></b></white>!</rainbow>"

@@ -1,0 +1,2 @@
+test-command-actions:
+    - "[console]: say Hi, <player>!"

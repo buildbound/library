@@ -1,0 +1,41 @@
+name: Build
+on:
+    push:
+        branches:
+            - main
+jobs:
+    Build:
+        name: Build and Publish
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v4
+            - name: Validate Gradle Wrapper
+              uses: gradle/actions/wrapper-validation@v4
+            - name: Setup Java
+              uses: actions/setup-java@v4
+              with:
+                  distribution: temurin
+                  cache: gradle
+                  java-version: 21
+            - name: Make gradlew executable
+              run: chmod +x ./gradlew
+            - id: version
+              name: Setup Version
+              run: echo "short_commit_hash=${GITHUB_SHA::10}" >> $GITHUB_OUTPUT
+            - name: Stage Artifacts
+              run: ./gradlew publish
+              env:
+                  LIBRARY_VERSION: ${{ steps.version.outputs.short_commit_hash }}
+            - name: Publish to Central
+              if: github.repository_owner == 'buildbound'
+              run: |
+                  ./gradlew jreleaserFullRelease
+              env:
+                  JRELEASER_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+                  JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.GPG_PUBLIC_KEY }}
+                  JRELEASER_GPG_SECRET_KEY: ${{ secrets.GPG_SECRET_KEY }}
+                  JRELEASER_PROJECT_VERSION: ${{ steps.version.outputs.short_commit_hash }}
+                  SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+                  SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+                  LIBRARY_VERSION: ${{ steps.version.outputs.short_commit_hash }}

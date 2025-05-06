@@ -1,0 +1,7 @@
+name: test-plugin
+version: '1.0.0'
+main: com.buildbound.library.testPlugin.TestPlugin
+api-version: '1.21'
+authors: [[buildbound]]
+description: A test plugin for the buildbound library.
+website: https://www.buildbound.com
