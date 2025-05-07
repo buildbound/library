@@ -127,8 +127,8 @@ jreleaser {
     }
     release {
         github {
-            enabled = false
             token = "empty"
+            skipRelease = true
         }
     }
 
