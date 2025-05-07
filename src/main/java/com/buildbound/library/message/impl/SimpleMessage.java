@@ -140,7 +140,7 @@ public class SimpleMessage implements Message {
 
         Scheduler.ASYNC.runGlobalTaskLater(
                 () -> {
-                    if (this.bossBars.get(audience).equals(bossBar)){
+                    if (bossBar.equals(this.bossBars.get(audience))) {
                         audience.hideBossBar(this.bossBars.remove(audience));
                     }
                 },
