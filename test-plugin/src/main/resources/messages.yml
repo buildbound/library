@@ -1,3 +1,9 @@
 test-message:
+    action-bar: "<rainbow>Hello World</rainbow>"
+    title:
+        title: "<rainbow>Title</rainbow>"
+        subtitle: "<white>Subtitle</white>"
+    boss-bar:
+        text: "<white><b>Hello, World</b></white>"
     content:
         - "<rainbow>Hi, <white><b><player_name></b></white>!</rainbow>"
