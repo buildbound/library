@@ -83,6 +83,10 @@ public class SimpleMessage implements Message {
     }
 
     private void sendContent(final @NotNull Audience audience, final @NotNull TagResolver[] tagResolvers) {
+        if (this.content.isEmpty()) {
+            return;
+        }
+
         final Component component = Component.join(JoinConfiguration.newlines(), this.content
                 .collect(text -> ComponentUtils.toComponent(text, tagResolvers))
         );
