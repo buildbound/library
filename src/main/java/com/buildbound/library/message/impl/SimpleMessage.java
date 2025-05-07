@@ -5,17 +5,19 @@ import com.buildbound.library.placeholder.Placeholder;
 import com.buildbound.library.scheduler.Scheduler;
 import com.buildbound.library.utils.ComponentUtils;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.audience.ForwardingAudience;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.title.Title;
 import net.kyori.adventure.title.TitlePart;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.eclipse.collections.api.factory.Lists;
+import org.eclipse.collections.api.factory.Maps;
 import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.api.map.MutableMap;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -36,6 +38,7 @@ public class SimpleMessage implements Message {
     private final Title.Times times;
 
     private final ImmutableList<String> content;
+    private final MutableMap<Audience, BossBar> bossBars = Maps.mutable.empty();
 
     public SimpleMessage(final @NotNull ConfigurationSection configurationSection) {
         this.actionBar = configurationSection.getString("action-bar");
@@ -105,6 +108,16 @@ public class SimpleMessage implements Message {
             return;
         }
 
+        // This should be improved in the future.
+        if (audience instanceof ForwardingAudience forwardingAudience) {
+            forwardingAudience.forEachAudience(aud -> this.sendBossBar(aud, tagResolvers));
+            return;
+        }
+
+        if (this.bossBars.containsKey(audience)) {
+            audience.hideBossBar(this.bossBars.remove(audience));
+        }
+
         final BossBar bossBar = BossBar.bossBar(
                 ComponentUtils.toComponent(this.bossBar, tagResolvers),
                 Float.parseFloat(ComponentUtils.toPlainText(this.progress, tagResolvers)),
@@ -117,10 +130,16 @@ public class SimpleMessage implements Message {
                         BossBar.Overlay.PROGRESS
                 )
         );
+
+        this.bossBars.put(audience, bossBar);
         audience.showBossBar(bossBar);
 
         Scheduler.ASYNC.runGlobalTaskLater(
-                () -> audience.hideBossBar(bossBar),
+                () -> {
+                    if (this.bossBars.get(audience).equals(bossBar)){
+                        audience.hideBossBar(this.bossBars.remove(audience));
+                    }
+                },
                 com.buildbound.library.time.Duration.parse(ComponentUtils.toPlainText(this.duration, tagResolvers))
         );
     }

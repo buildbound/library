@@ -20,6 +20,9 @@ public class TestCommand {
         AutoWireConstants.TEST_MESSAGE.send(commandSender.source(), Placeholder.placeholder()
                 .with("player_name", commandSender.source().name())
         );
+        AutoWireConstants.TEST_MESSAGE.broadcast(Placeholder.placeholder()
+                .with("player_name", commandSender.source().name())
+        );
         AutoWireConstants.ACTION.execute(commandSender.source(), Placeholder.placeholder()
                 .with("player", commandSender.source().name())
         );
