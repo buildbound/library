@@ -1,0 +1,7 @@
+test-item:
+    material: "DIAMOND"
+    name: "<yellow><b>Legendary Diamond</b></yellow>"
+    lore:
+        - "<gold>Legendary Reward</gold>"
+        - ""
+        - "<rainbow>This is a special item!</rainbow>"

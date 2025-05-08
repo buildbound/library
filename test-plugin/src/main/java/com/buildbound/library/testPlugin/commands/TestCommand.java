@@ -26,6 +26,7 @@ public class TestCommand {
         AutoWireConstants.ACTION.execute(commandSender.source(), Placeholder.placeholder()
                 .with("player", commandSender.source().name())
         );
+        commandSender.source().getInventory().addItem(AutoWireConstants.ITEM.toItemStack(Placeholder.placeholder()));
     }
 
 }
