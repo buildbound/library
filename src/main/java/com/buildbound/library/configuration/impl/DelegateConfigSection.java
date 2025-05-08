@@ -5,6 +5,8 @@ import com.buildbound.library.action.Action;
 import com.buildbound.library.action.holder.ActionHolder;
 import com.buildbound.library.configuration.ConfigSection;
 import com.buildbound.library.configuration.blank.BlankSection;
+import com.buildbound.library.item.Item;
+import com.buildbound.library.item.impl.BukkitItem;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -20,6 +22,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 public record DelegateConfigSection(ConfigurationSection delegate, Plugin plugin) implements ConfigSection {
@@ -30,6 +33,11 @@ public record DelegateConfigSection(ConfigurationSection delegate, Plugin plugin
         action.setup(this, this.plugin.getActionRegistry());
 
         return action;
+    }
+
+    @Override
+    public @NotNull Item getItem(final @NotNull String path) {
+        return new BukkitItem(Objects.requireNonNull(this.getConfigurationSection(path)));
     }
 
     @Override

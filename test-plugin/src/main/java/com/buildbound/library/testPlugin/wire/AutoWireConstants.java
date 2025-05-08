@@ -10,6 +10,6 @@ public class AutoWireConstants {
 
     public static final Message TEST_MESSAGE = Message.holder("test-message");
     public static final Action ACTION = Action.holder("test-command-actions");
-    public static final Item ITEM = Item.holder("config.yml", section -> Item.item(section, "test-item"));
+    public static final Item ITEM = Item.holder("config.yml", section -> section.getItem("test-item"));
 
 }

@@ -1,0 +1,7 @@
+title: "<rainbow>Example Menu</rainbow>"
+size: 27
+
+menu-items:
+    - display-item:
+          material: DIAMOND_SWORD
+      slots: [ 13 ]

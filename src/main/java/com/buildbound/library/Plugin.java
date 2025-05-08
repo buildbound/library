@@ -4,6 +4,7 @@ import com.buildbound.library.action.holder.ActionHolder;
 import com.buildbound.library.action.registry.ActionRegistry;
 import com.buildbound.library.configuration.ConfigSection;
 import com.buildbound.library.configuration.impl.DelegateConfigSection;
+import com.buildbound.library.menu.listeners.MenuClickListener;
 import com.buildbound.library.message.holder.MessageHolder;
 import com.buildbound.library.scheduler.Scheduler;
 import com.buildbound.library.utils.IOUtils;
@@ -61,6 +62,9 @@ public class Plugin extends JavaPlugin {
 
         // Auto Wire
         this.autoWire();
+
+        // Register Menu Listeners
+        this.registerListener(new MenuClickListener());
 
         super.onEnable();
     }

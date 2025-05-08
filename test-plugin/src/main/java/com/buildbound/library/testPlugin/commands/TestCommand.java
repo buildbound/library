@@ -1,5 +1,7 @@
 package com.buildbound.library.testPlugin.commands;
 
+import com.buildbound.library.context.Context;
+import com.buildbound.library.menu.Menu;
 import com.buildbound.library.placeholder.Placeholder;
 import com.buildbound.library.testPlugin.wire.AutoWireConstants;
 import org.incendo.cloud.annotation.specifier.Greedy;
@@ -10,7 +12,7 @@ import org.incendo.cloud.annotations.Permission;
 import org.incendo.cloud.paper.util.sender.PlayerSource;
 import org.jetbrains.annotations.NotNull;
 
-public class TestCommand {
+public record TestCommand(Menu menu) {
 
     @Command("shout <text>")
     @CommandDescription("Broadcast a message to all players.")
@@ -27,6 +29,7 @@ public class TestCommand {
                 .with("player", commandSender.source().name())
         );
         commandSender.source().getInventory().addItem(AutoWireConstants.ITEM.toItemStack(Placeholder.placeholder()));
+        this.menu.openInventory(commandSender.source(), new Context());
     }
 
 }

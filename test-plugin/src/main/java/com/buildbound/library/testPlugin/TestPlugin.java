@@ -1,7 +1,12 @@
 package com.buildbound.library.testPlugin;
 
 import com.buildbound.library.Plugin;
+import com.buildbound.library.menu.Menu;
+import com.buildbound.library.menu.impl.BukkitMenu;
+import com.buildbound.library.testPlugin.buttons.TestButton;
 import com.buildbound.library.testPlugin.commands.TestCommand;
+
+import java.util.List;
 
 public final class TestPlugin extends Plugin {
 
@@ -17,7 +22,12 @@ public final class TestPlugin extends Plugin {
     public void onEnable() {
         super.onEnable();
 
-        this.registerCommand(new TestCommand());
+        // Load Menu
+        final Menu menu = new BukkitMenu(this.getConfig("example-menu.yml"))
+                .withButton(new TestButton(), List.of(1));
+
+        // Register Command
+        this.registerCommand(new TestCommand(menu));
     }
 
     @Override
