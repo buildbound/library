@@ -2,19 +2,18 @@ package com.buildbound.library.menu.listeners;
 
 import com.buildbound.library.menu.Menu;
 import com.buildbound.library.menu.holder.BukkitMenuHolder;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.jetbrains.annotations.NotNull;
 
-public class MenuClickListener implements Listener {
+public class MenuCloseListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onInventoryClick(final @NotNull InventoryClickEvent event) {
+    public void onInventoryClose(final @NotNull InventoryCloseEvent event) {
         final InventoryView inventoryView = event.getView();
         final Inventory topInventory = inventoryView.getTopInventory();
 
@@ -22,11 +21,10 @@ public class MenuClickListener implements Listener {
             return;
         }
 
-        event.setCancelled(true);
-        event.setResult(Event.Result.DENY);
-
         final Menu menu = bukkitMenuHolder.getMenu();
-        menu.handleClickEvent(event, bukkitMenuHolder.getContext());
+        bukkitMenuHolder.getContext().set(Menu.CLOSED, true);
+
+        menu.handleCloseEvent(event, bukkitMenuHolder.getContext());
     }
 
 }

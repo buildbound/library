@@ -18,4 +18,8 @@ public class Context {
         return (T) this.context.get(key.key().asString());
     }
 
+    public <T> boolean has(final @NotNull ContextKey<T> key) {
+        return this.context.containsKey(key.key().asString());
+    }
+
 }

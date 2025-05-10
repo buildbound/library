@@ -19,6 +19,7 @@ allprojects {
         mavenCentral()
         maven("https://repo.papermc.io/repository/maven-public/")
         maven("https://oss.sonatype.org/content/groups/public/")
+        maven("https://repo.codemc.io/repository/maven-releases/")
     }
 
     dependencies {
@@ -42,6 +43,7 @@ dependencies {
     api("org.incendo:cloud-paper:2.0.0-beta.10")
 
     api("io.github.classgraph:classgraph:4.8.179")
+    api("com.github.retrooper:packetevents-spigot:2.7.0")
 }
 
 tasks {

@@ -6,51 +6,64 @@ import com.buildbound.library.item.Item;
 import com.buildbound.library.menu.Menu;
 import com.buildbound.library.menu.button.MenuButton;
 import com.buildbound.library.menu.holder.BukkitMenuHolder;
+import com.buildbound.library.menu.inventory.FakePlayerInventory;
+import com.buildbound.library.menu.pattern.Pattern;
+import com.buildbound.library.menu.render.RenderResult;
 import com.buildbound.library.placeholder.Placeholder;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
-import org.eclipse.collections.api.factory.Maps;
-import org.eclipse.collections.api.map.ImmutableMap;
-import org.eclipse.collections.api.map.MutableMap;
-import org.eclipse.collections.api.tuple.Pair;
+import org.eclipse.collections.api.factory.Lists;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
+import java.util.Objects;
 
 public class BukkitMenu implements Menu {
 
     private final String title;
-    private final int size;
 
-    private final MutableMap<Integer, MenuButton> buttons = Maps.mutable.empty();
-    private final ImmutableMap<Integer, Item> items;
+    private final Pattern pattern;
+    private final Pattern playerPattern;
 
     public BukkitMenu(final @NotNull ConfigSection configSection) {
         this.title = configSection.getString("title", "Inventory");
-        this.size = configSection.getInt("size");
-
-        // Load Items
-        final MutableMap<Integer, Item> items = Maps.mutable.empty();
+        this.pattern = new Pattern(
+                Lists.immutable.ofAll(configSection.getStringList("pattern"))
+        );
+        this.playerPattern = new Pattern(
+                Lists.immutable.ofAll(configSection.getStringList("player-pattern"))
+        );
 
         for (final ConfigSection section : configSection.getSectionList("menu-items")) {
-            final List<Integer> slots = section.getIntegerList("slots");
             final Item displayItem = section.getItem("display-item");
+            final char character = Objects.requireNonNull(section.getString("character")).charAt(0);
 
-            for (final Integer slot : slots) {
-                items.put(slot, displayItem);
-            }
+            this.pattern.setPalette(
+                    character,
+                    (slot, context) -> new RenderResult.ItemResult(displayItem.toItemStack(Placeholder.placeholder()))
+            );
+            this.playerPattern.setPalette(
+                    character,
+                    (slot, context) -> new RenderResult.ItemResult(displayItem.toItemStack(Placeholder.placeholder()))
+            );
         }
-
-        this.items = items.toImmutable();
     }
 
     @Override
-    public @NotNull Menu withButton(final @NotNull MenuButton menuButton, final @NotNull Iterable<Integer> slots) {
-        for (final int slot : slots) {
-            this.buttons.put(slot, menuButton);
-        }
+    public @NotNull Menu withButton(final @NotNull MenuButton menuButton, final char character) {
+        this.pattern.setPalette(character, menuButton::render);
+        this.pattern.setClick(character, (slot, context) -> {
+            menuButton.onClick(slot, context);
+            return null;
+        });
 
+        this.playerPattern.setPalette(character, menuButton::render);
+        this.playerPattern.setClick(character, (slot, context) -> {
+            menuButton.onClick(slot, context);
+            return null;
+        });
         return this;
     }
 
@@ -60,45 +73,70 @@ public class BukkitMenu implements Menu {
                 this,
                 context,
                 this.title,
-                this.size
+                this.pattern.getInventorySize()
         );
 
-        final Placeholder placeholder = Placeholder.placeholder();
         final Inventory inventory = menuHolder.getInventory();
 
         // set default context
         context.set(Menu.INVENTORY, inventory);
 
-        // set static items
-        for (final Pair<Integer, Item> itemPair : this.items.keyValuesView()) {
-            final int slot = itemPair.getOne();
-            final Item item = itemPair.getTwo();
-
-            inventory.setItem(slot, item.toItemStack(placeholder));
+        if (this.playerPattern.getInventorySize() > 0) {
+            context.set(Menu.FAKE_INVENTORY, new FakePlayerInventory(player));
         }
 
-        // render buttons
-        for (final Pair<Integer, MenuButton> buttonPair : this.buttons.keyValuesView()) {
-            final int slot = buttonPair.getOne();
-            final MenuButton button = buttonPair.getTwo();
-
-            button.render(slot, context);
-        }
+        this.pattern.renderPattern(context, inventory);
 
         player.openInventory(inventory);
+
+        if (player.getGameMode() != GameMode.CREATIVE) {
+            this.playerPattern.renderPlayerPattern(context);
+        }
     }
 
     @Override
     public void handleClickEvent(final @NotNull InventoryClickEvent event, final @NotNull Context context) {
-        final int slot = event.getSlot();
-        final MenuButton button = this.buttons.get(slot);
+        if (event.getView().getTopInventory().equals(event.getClickedInventory())) {
+            context.set(Menu.INVENTORY, event.getInventory());
+            context.set(Menu.LAST_CLICK, event);
 
-        if (button == null) {
+            final int slot = event.getSlot();
+            this.pattern.handleClickEvent(slot, context, true);
             return;
         }
 
+        context.set(Menu.INVENTORY, context.get(Menu.FAKE_INVENTORY));
         context.set(Menu.LAST_CLICK, event);
-        button.onClick(slot, context);
+
+        final int slot = event.getSlot();
+        this.playerPattern.handleClickEvent(slot, context, false);
+
+        if (context.has(Menu.FAKE_INVENTORY)) {
+            context.get(Menu.FAKE_INVENTORY).refreshSlot(slot);
+        }
+    }
+
+    @Override
+    public void handleCloseEvent(final @NotNull InventoryCloseEvent event, final @NotNull Context context) {
+        final Player player = (Player) event.getPlayer();
+        player.updateInventory();
+
+        if (!context.has(Menu.FAKE_INVENTORY)){
+            return;
+        }
+
+        final FakePlayerInventory fakePlayerInventory = context.get(Menu.FAKE_INVENTORY);
+        fakePlayerInventory.consumeInventory(player);
+    }
+
+    @Override
+    public void refreshPlayerInventory(final @NotNull Player player, final @NotNull Context context) {
+        if (!context.has(Menu.FAKE_INVENTORY)){
+            return;
+        }
+
+        final FakePlayerInventory fakePlayerInventory = context.get(Menu.FAKE_INVENTORY);
+        fakePlayerInventory.refresh();
     }
 
 }

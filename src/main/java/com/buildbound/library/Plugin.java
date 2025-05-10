@@ -4,14 +4,20 @@ import com.buildbound.library.action.holder.ActionHolder;
 import com.buildbound.library.action.registry.ActionRegistry;
 import com.buildbound.library.configuration.ConfigSection;
 import com.buildbound.library.configuration.impl.DelegateConfigSection;
+import com.buildbound.library.menu.listeners.ContainerRefreshProtocolListener;
+import com.buildbound.library.menu.listeners.ContainerSetSlotProtocolListener;
 import com.buildbound.library.menu.listeners.MenuClickListener;
+import com.buildbound.library.menu.listeners.MenuCloseListener;
 import com.buildbound.library.message.holder.MessageHolder;
 import com.buildbound.library.scheduler.Scheduler;
 import com.buildbound.library.utils.IOUtils;
 import com.buildbound.library.wire.AutoWire;
 import com.buildbound.library.wire.holder.impl.ConfigHolder;
 import com.buildbound.library.wire.repository.AutoWireRepository;
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import io.github.classgraph.*;
+import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.Listener;
@@ -54,6 +60,11 @@ public class Plugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
+        PacketEvents.getAPI().load();
+        PacketEvents.getAPI().getEventManager().registerListener(new ContainerRefreshProtocolListener(), PacketListenerPriority.NORMAL);
+        PacketEvents.getAPI().getEventManager().registerListener(new ContainerSetSlotProtocolListener(), PacketListenerPriority.NORMAL);
+
         final PaperCommandManager<Source> commandManager = PaperCommandManager.builder(PaperSimpleSenderMapper.simpleSenderMapper())
                 .executionCoordinator(ExecutionCoordinator.simpleCoordinator())
                 .buildOnEnable(this);
@@ -65,6 +76,7 @@ public class Plugin extends JavaPlugin {
 
         // Register Menu Listeners
         this.registerListener(new MenuClickListener());
+        this.registerListener(new MenuCloseListener());
 
         super.onEnable();
     }

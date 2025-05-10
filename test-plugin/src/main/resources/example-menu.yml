@@ -1,7 +1,14 @@
 title: "<rainbow>Example Menu</rainbow>"
-size: 27
+pattern:
+    - "- - - - # - - - -"
+
+player-pattern:
+    - "- - - # - - - - -"
+    - "- - # - - - - - -"
+    - "- # - - - - - - -"
+    - "# - - - - - - - -"
 
 menu-items:
     - display-item:
           material: DIAMOND_SWORD
-      slots: [ 13 ]
+      character: "#"
