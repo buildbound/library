@@ -86,12 +86,11 @@ public class BukkitMenu implements Menu {
         }
 
         this.pattern.renderPattern(context, inventory);
+//        if (player.getGameMode() != GameMode.CREATIVE) {
+            this.playerPattern.renderPlayerPattern(context);
+//        }
 
         player.openInventory(inventory);
-
-        if (player.getGameMode() != GameMode.CREATIVE) {
-            this.playerPattern.renderPlayerPattern(context);
-        }
     }
 
     @Override
