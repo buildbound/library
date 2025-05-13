@@ -9,6 +9,14 @@ public class Context {
 
     private final MutableMap<String, Object> context = Maps.mutable.empty();
 
+    public Context() {
+        // Default constructor
+    }
+
+    protected Context(final @NotNull Context context) {
+        this.context.putAllMapIterable(context.context);
+    }
+
     public <T> void set(final @NotNull ContextKey<T> key, final @NotNull T value) {
         this.context.put(key.key().asString(), value);
     }
@@ -20,6 +28,11 @@ public class Context {
 
     public <T> boolean has(final @NotNull ContextKey<T> key) {
         return this.context.containsKey(key.key().asString());
+    }
+
+    @NotNull
+    public Context createSnapshot() {
+        return new Context(this);
     }
 
 }

@@ -86,29 +86,29 @@ public class BukkitMenu implements Menu {
         }
 
         this.pattern.renderPattern(context, inventory);
-//        if (player.getGameMode() != GameMode.CREATIVE) {
-            this.playerPattern.renderPlayerPattern(context);
-//        }
+        this.playerPattern.renderPlayerPattern(context);
 
         player.openInventory(inventory);
     }
 
     @Override
     public void handleClickEvent(final @NotNull InventoryClickEvent event, final @NotNull Context context) {
+        final Context snapshot = context.createSnapshot();
+
         if (event.getView().getTopInventory().equals(event.getClickedInventory())) {
-            context.set(Menu.INVENTORY, event.getInventory());
-            context.set(Menu.LAST_CLICK, event);
+            snapshot.set(Menu.INVENTORY, event.getInventory());
+            snapshot.set(Menu.LAST_CLICK, event);
 
             final int slot = event.getSlot();
-            this.pattern.handleClickEvent(slot, context, true);
+            this.pattern.handleClickEvent(slot, snapshot, true);
             return;
         }
 
-        context.set(Menu.INVENTORY, context.get(Menu.FAKE_INVENTORY));
-        context.set(Menu.LAST_CLICK, event);
+        snapshot.set(Menu.INVENTORY, context.get(Menu.FAKE_INVENTORY));
+        snapshot.set(Menu.LAST_CLICK, event);
 
         final int slot = event.getSlot();
-        this.playerPattern.handleClickEvent(slot, context, false);
+        this.playerPattern.handleClickEvent(slot, snapshot, false);
 
         if (context.has(Menu.FAKE_INVENTORY)) {
             context.get(Menu.FAKE_INVENTORY).refreshSlot(slot);
