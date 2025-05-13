@@ -4,6 +4,8 @@ import com.buildbound.library.context.Context;
 import com.buildbound.library.menu.Menu;
 import com.buildbound.library.menu.button.MenuButton;
 import com.buildbound.library.menu.render.RenderResult;
+import com.buildbound.library.placeholder.Placeholder;
+import com.buildbound.library.testPlugin.wire.AutoWireConstants;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -19,6 +21,8 @@ public class TestButton implements MenuButton {
     public void onClick(final int slot, final @NotNull Context context) {
         context.get(Menu.INVENTORY).setItem(slot, new ItemStack(Material.NETHERITE_INGOT));
         context.get(Menu.LAST_CLICK).getWhoClicked().sendMessage("You clicked the button!");
+
+        AutoWireConstants.TEMPORARY_ITEM.getValue().send(context, Placeholder.placeholder());
     }
 
 }

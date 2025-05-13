@@ -4,7 +4,6 @@ import com.buildbound.library.context.Context;
 import com.buildbound.library.menu.Menu;
 import com.buildbound.library.menu.inventory.FakePlayerInventory;
 import com.buildbound.library.menu.render.RenderResult;
-import com.buildbound.library.menu.slot.Slot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.eclipse.collections.api.factory.Maps;
@@ -20,7 +19,7 @@ public class Pattern {
 
     private final int inventorySize;
 
-    private final MutableMap<Slot, Character> characters = Maps.mutable.empty();
+    private final MutableMap<Integer, Character> characters = Maps.mutable.empty();
 
     private final MutableMap<Character, BiFunction<Integer, Context, RenderResult>> renders = Maps.mutable.empty();
     private final MutableMap<Character, BiFunction<Integer, Context, Void>> clicks = Maps.mutable.empty();
@@ -32,7 +31,7 @@ public class Pattern {
 
             for (int slotIndex = 0; slotIndex < Math.min(9, chars.length); slotIndex++) {
                 final char character = chars[slotIndex];
-                this.characters.put(new Slot(true, (index * 9) + slotIndex), character);
+                this.characters.put((index * 9) + slotIndex, character);
             }
         }
 
@@ -51,14 +50,38 @@ public class Pattern {
         this.clicks.put(character, click);
     }
 
+    public void renderSlot(final @NotNull Inventory inventory,
+                           final @NotNull Context context,
+                           final int slot) {
+        final int index = inventory instanceof FakePlayerInventory
+                ? (slot + 27) % 36
+                : slot;
+        final Character character = this.characters.get(index);
+
+        if (character == null) {
+            return;
+        }
+
+        final BiFunction<Integer, Context, RenderResult> renderer = this.renders.get(character);
+
+        if (renderer == null) {
+            return;
+        }
+
+        final RenderResult renderResult = renderer.apply(slot, context);
+        switch (renderResult) {
+            case RenderResult.ItemResult itemResult -> inventory.setItem(slot, itemResult.itemStack());
+        }
+    }
+
     public void renderPattern(final @NotNull Context context,
                               final @NotNull Inventory inventory) {
         if (this.getInventorySize() == 0) {
             return;
         }
 
-        for (final Pair<Slot, Character> entry : this.characters.keyValuesView()) {
-            final int slot = entry.getOne().slot();
+        for (final Pair<Integer, Character> entry : this.characters.keyValuesView()) {
+            final int slot = entry.getOne();
             final char character = entry.getTwo();
 
             final BiFunction<Integer, Context, RenderResult> renderer = this.renders.get(character);
@@ -86,7 +109,7 @@ public class Pattern {
 
         for (int index = 0; index < 36; index++) {
             final int slot = (index % 36) + 9;
-            final Character character = this.characters.get(new Slot(true, index));
+            final Character character = this.characters.get(index);
 
             if (character == null) {
                 inventory[slot] = ItemStack.empty();
@@ -110,7 +133,7 @@ public class Pattern {
 
     public void handleClickEvent(final int slot, final @NotNull Context context, final boolean topInventory) {
         final int realSlot = topInventory ? slot : (slot + 27) % 36;
-        final Character character = this.characters.get(new Slot(true, realSlot));
+        final Character character = this.characters.get(realSlot);
 
         if (character == null) {
             return;

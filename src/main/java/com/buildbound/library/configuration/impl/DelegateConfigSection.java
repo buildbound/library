@@ -7,6 +7,9 @@ import com.buildbound.library.configuration.ConfigSection;
 import com.buildbound.library.configuration.blank.BlankSection;
 import com.buildbound.library.item.Item;
 import com.buildbound.library.item.impl.BukkitItem;
+import com.buildbound.library.item.temporary.TemporaryItem;
+import com.buildbound.library.message.Message;
+import com.buildbound.library.message.impl.SimpleMessage;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -38,6 +41,16 @@ public record DelegateConfigSection(ConfigurationSection delegate, Plugin plugin
     @Override
     public @NotNull Item getItem(final @NotNull String path) {
         return new BukkitItem(Objects.requireNonNull(this.getConfigurationSection(path)));
+    }
+
+    @Override
+    public @NotNull Message getMessage(final @NotNull String path) {
+        return new SimpleMessage(Objects.requireNonNull(this.getConfigurationSection(path)));
+    }
+
+    @Override
+    public @NotNull TemporaryItem getTemporaryItem(final @NotNull String path) {
+        return new TemporaryItem(Objects.requireNonNull(this.getConfigurationSection(path)));
     }
 
     @Override

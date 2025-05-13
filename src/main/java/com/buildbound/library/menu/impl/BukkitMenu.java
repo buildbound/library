@@ -10,7 +10,6 @@ import com.buildbound.library.menu.inventory.FakePlayerInventory;
 import com.buildbound.library.menu.pattern.Pattern;
 import com.buildbound.library.menu.render.RenderResult;
 import com.buildbound.library.placeholder.Placeholder;
-import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -80,6 +79,7 @@ public class BukkitMenu implements Menu {
 
         // set default context
         context.set(Menu.INVENTORY, inventory);
+        context.set(Menu.MENU, this);
 
         if (this.playerPattern.getInventorySize() > 0) {
             context.set(Menu.FAKE_INVENTORY, new FakePlayerInventory(player));
@@ -136,6 +136,18 @@ public class BukkitMenu implements Menu {
 
         final FakePlayerInventory fakePlayerInventory = context.get(Menu.FAKE_INVENTORY);
         fakePlayerInventory.refresh();
+    }
+
+    @Override
+    public void renderSlot(final @NotNull Inventory inventory,
+                           final @NotNull Context context,
+                           final int slot) {
+        if (inventory instanceof FakePlayerInventory) {
+            this.playerPattern.renderSlot(inventory, context, slot);
+            return;
+        }
+
+        this.pattern.renderSlot(inventory, context, slot);
     }
 
 }

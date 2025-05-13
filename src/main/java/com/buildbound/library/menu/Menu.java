@@ -14,6 +14,9 @@ import org.jetbrains.annotations.NotNull;
 public interface Menu {
 
     @NotNull
+    ContextKey<Menu> MENU = new ContextKey<>(Key.key("library", "menu"));
+
+    @NotNull
     ContextKey<Inventory> INVENTORY = new ContextKey<>(Key.key("library", "inventory"));
 
     @NotNull
@@ -35,5 +38,9 @@ public interface Menu {
     void handleCloseEvent(final @NotNull InventoryCloseEvent event, final @NotNull Context context);
 
     void refreshPlayerInventory(final @NotNull Player player, final @NotNull Context context);
+
+    void renderSlot(final @NotNull Inventory inventory,
+                    final @NotNull Context context,
+                    final int slot);
 
 }

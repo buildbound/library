@@ -5,3 +5,11 @@ test-item:
         - "<gold>Legendary Reward</gold>"
         - ""
         - "<rainbow>This is a special item!</rainbow>"
+
+test-temporary-item:
+    display-item:
+        material: "YELLOW_DYE"
+        name: "<yellow><b>Temporary Item</b></yellow>"
+    interact-message:
+        content:
+            - "<red>Hi, World</red>"
