@@ -80,6 +80,7 @@ public class BukkitMenu implements Menu {
         // set default context
         context.set(Menu.INVENTORY, inventory);
         context.set(Menu.MENU, this);
+        context.set(Menu.PLAYER, player);
 
         if (this.playerPattern.getInventorySize() > 0) {
             context.set(Menu.FAKE_INVENTORY, new FakePlayerInventory(player));

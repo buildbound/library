@@ -20,6 +20,9 @@ public interface Menu {
     ContextKey<Inventory> INVENTORY = new ContextKey<>(Key.key("library", "inventory"));
 
     @NotNull
+    ContextKey<Player> PLAYER = new ContextKey<>(Key.key("library", "player"));
+
+    @NotNull
     ContextKey<FakePlayerInventory> FAKE_INVENTORY = new ContextKey<>(Key.key("library", "fake_inventory"));
 
     @NotNull
