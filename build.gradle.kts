@@ -23,7 +23,7 @@ allprojects {
     }
 
     dependencies {
-        compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
+        compileOnly("io.papermc.paper:paper-api:1.21.7-R0.1-SNAPSHOT")
         compileOnly("org.jetbrains:annotations:26.0.0")
     }
 
@@ -43,7 +43,7 @@ dependencies {
     api("org.incendo:cloud-paper:2.0.0-beta.10")
 
     api("io.github.classgraph:classgraph:4.8.179")
-    api("com.github.retrooper:packetevents-spigot:2.7.0")
+    api("com.github.retrooper:packetevents-spigot:2.9.1")
 }
 
 tasks {
