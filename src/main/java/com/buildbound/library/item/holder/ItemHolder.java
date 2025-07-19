@@ -20,4 +20,9 @@ public class ItemHolder extends ConfigHolder<Item> implements Item {
         return this.getValue().toItemStack(placeholder);
     }
 
+    @Override
+    public void updateItemStack(final @NotNull ItemStack itemStack, final @NotNull Placeholder placeholder) {
+        this.getValue().updateItemStack(itemStack, placeholder);
+    }
+
 }

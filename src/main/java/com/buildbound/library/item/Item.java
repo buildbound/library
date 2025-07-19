@@ -17,4 +17,6 @@ public interface Item {
 
     @NotNull ItemStack toItemStack(final @NotNull Placeholder placeholder);
 
+    void updateItemStack(final @NotNull ItemStack itemStack, final @NotNull Placeholder placeholder);
+
 }

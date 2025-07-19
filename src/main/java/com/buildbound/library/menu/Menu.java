@@ -11,6 +11,8 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.Function;
+
 public interface Menu {
 
     @NotNull
@@ -33,6 +35,15 @@ public interface Menu {
 
     @NotNull
     Menu withButton(final @NotNull MenuButton menuButton, final char character);
+
+    @NotNull
+    Menu withButton(final @NotNull MenuButton menuButton, final @NotNull String character);
+
+    @NotNull
+    <T> Menu constant(final @NotNull ContextKey<T> contextKey, final @NotNull T value);
+
+    @NotNull
+    <T> Menu dynamic(final @NotNull ContextKey<T> contextKey, final @NotNull Function<Context, T> function);
 
     void openInventory(final @NotNull Player player, final @NotNull Context context);
 

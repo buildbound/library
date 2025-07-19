@@ -30,6 +30,10 @@ public class Context {
         return this.context.containsKey(key.key().asString());
     }
 
+    public void consume(final @NotNull Context context) {
+        this.context.putAll(context.context);
+    }
+
     @NotNull
     public Context createSnapshot() {
         return new Context(this);

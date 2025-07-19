@@ -2,9 +2,11 @@ package com.buildbound.library.menu.impl;
 
 import com.buildbound.library.configuration.ConfigSection;
 import com.buildbound.library.context.Context;
+import com.buildbound.library.context.key.ContextKey;
 import com.buildbound.library.item.Item;
 import com.buildbound.library.menu.Menu;
 import com.buildbound.library.menu.button.MenuButton;
+import com.buildbound.library.menu.context.DynamicContextFunction;
 import com.buildbound.library.menu.holder.BukkitMenuHolder;
 import com.buildbound.library.menu.inventory.FakePlayerInventory;
 import com.buildbound.library.menu.pattern.Pattern;
@@ -15,9 +17,11 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.eclipse.collections.api.factory.Lists;
+import org.eclipse.collections.api.list.MutableList;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
+import java.util.function.Function;
 
 public class BukkitMenu implements Menu {
 
@@ -25,6 +29,9 @@ public class BukkitMenu implements Menu {
 
     private final Pattern pattern;
     private final Pattern playerPattern;
+
+    private final Context context = new Context();
+    private final MutableList<DynamicContextFunction<?>> contextFunctions = Lists.mutable.empty();
 
     public BukkitMenu(final @NotNull ConfigSection configSection) {
         this.title = configSection.getString("title", "Inventory");
@@ -67,7 +74,27 @@ public class BukkitMenu implements Menu {
     }
 
     @Override
+    public @NotNull Menu withButton(final @NotNull MenuButton menuButton, final @NotNull String character) {
+        final char characters = Objects.requireNonNull(character).charAt(0);
+        return this.withButton(menuButton, characters);
+    }
+
+    @Override
+    public @NotNull <T> Menu constant(final @NotNull ContextKey<T> contextKey, @NotNull final T value) {
+        this.context.set(contextKey, value);
+        return this;
+    }
+
+    @Override
+    public @NotNull <T> Menu dynamic(final @NotNull ContextKey<T> contextKey, final @NotNull Function<Context, T> function) {
+        this.contextFunctions.add(new DynamicContextFunction<>(contextKey, function));
+        return this;
+    }
+
+    @Override
     public void openInventory(final @NotNull Player player, final @NotNull Context context) {
+        context.consume(this.context);
+
         final BukkitMenuHolder menuHolder = new BukkitMenuHolder(
                 this,
                 context,
@@ -84,6 +111,11 @@ public class BukkitMenu implements Menu {
 
         if (this.playerPattern.getInventorySize() > 0) {
             context.set(Menu.FAKE_INVENTORY, new FakePlayerInventory(player));
+        }
+
+        // apply dynamic context functions
+        for (final DynamicContextFunction<?> function : this.contextFunctions) {
+            function.apply(context);
         }
 
         this.pattern.renderPattern(context, inventory);
