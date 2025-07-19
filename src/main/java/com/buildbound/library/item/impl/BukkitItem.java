@@ -67,7 +67,7 @@ public class BukkitItem implements Item {
         final ItemMeta itemMeta = itemStack.getItemMeta();
 
         if (this.name != null) {
-            itemMeta.itemName(ComponentUtils.toComponent(this.name));
+            itemMeta.itemName(ComponentUtils.toComponent(this.name, tagResolvers));
         }
 
         if (!this.lore.isEmpty()) {
